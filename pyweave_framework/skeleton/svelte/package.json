@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@inertiajs/svelte": "latest",
+    "@sveltejs/vite-plugin-svelte": "latest",
+    "vite": "latest",
+    "svelte": "latest"
+  },
+  "devDependencies": {
+    "vite-plugin-pwa": "latest"
+  }
+}

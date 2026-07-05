@@ -1,0 +1,98 @@
+# {{ project_name }}
+
+A PyWeave application.
+
+PyWeave gives you:
+
+- Flask underneath
+- Jinja as the primary templating language
+- file-based backend routes in `app/pages`
+- full SPA navigation without React Router, Vue Router, or any frontend router
+- offline-first PWA support by default
+- optional enhancement starters for Vue, React, Svelte, and Alpine
+
+## Run locally
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+pyweave dev
+```
+
+Open `http://127.0.0.1:5000`.
+
+If you generated a Vue, React, Svelte, or Alpine-enhanced app, also run:
+
+```bash
+npm install
+```
+
+## Routes
+
+Backend routes are created from files:
+
+```txt
+app/pages/index.py        -> /
+app/pages/about.py        -> /about
+app/pages/users/index.py  -> /users
+app/pages/users/[id].py   -> /users/<id>
+```
+
+Each route returns template data. By convention, the matching Jinja template is loaded from `templates/pages`:
+
+```python
+def page():
+    return {
+        "title": "Home",
+        "posts": [],
+    }
+```
+
+This renders:
+
+```txt
+templates/pages/index.html
+```
+
+You can choose another template explicitly:
+
+```python
+def page():
+    return {
+        "template": "marketing/landing.html",
+        "props": {"title": "Launch"},
+    }
+```
+
+## Jinja SPA navigation
+
+PyWeave intercepts internal links, requests the next Jinja page with `X-PyWeave`, swaps the HTML into the app shell, updates browser history, and keeps the same Flask/Jinja mental model.
+
+You build pages with Jinja, but users experience app-like navigation.
+
+## Optional component stacks
+
+You can still create apps with optional component support:
+
+```bash
+pyweave new my-app --stack vue
+pyweave new my-app --stack react
+pyweave new my-app --stack svelte
+pyweave new my-app --stack alpine
+```
+
+Jinja remains the primary rendering system. Component stacks are enhancement modes.
+
+## PWA and offline-first SPA support
+
+Every generated PyWeave app includes:
+
+- `static/manifest.webmanifest`
+- `static/sw.js` service worker
+- `static/offline.html`
+- app icons
+- `static/pyweave-spa.js` for Jinja SPA navigation
+- automatic offline route precaching via `/__pyweave/offline-manifest`
+
+Static routes work offline after installation. Dynamic routes are cached after the first visit.

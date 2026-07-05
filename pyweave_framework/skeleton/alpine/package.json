@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@inertiajs/inertia": "latest",
+    "vite": "latest",
+    "alpinejs": "latest"
+  },
+  "devDependencies": {
+    "vite-plugin-pwa": "latest"
+  }
+}

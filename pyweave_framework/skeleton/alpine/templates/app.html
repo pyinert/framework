@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.props.title or 'PyWeave' }}</title>
+  <script type="module" src="http://localhost:5173/frontend/app.js"></script>
+</head>
+<body>
+  <div id="app" data-page='{{ page | tojson }}' x-data="PyWeavePage.props">
+    <h1 x-text="title || 'PyWeave'"></h1>
+    <p x-text="message || body || 'Alpine starter page'"></p>
+    <a href="/">Home</a> · <a href="/about">About</a> · <a href="/users">Users</a>
+
+    <template x-if="users">
+      <ul>
+        <template x-for="user in users" :key="user.id">
+          <li><a :href="'/users/' + user.id" x-text="user.name"></a></li>
+        </template>
+      </ul>
+    </template>
+
+    <template x-if="user">
+      <p><strong>User ID:</strong> <span x-text="user.id"></span></p>
+    </template>
+  </div>
+</body>
+</html>

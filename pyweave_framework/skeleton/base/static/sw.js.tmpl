@@ -1,0 +1,137 @@
+const PYWEAVE_VERSION = '{{ project_name }}-offline-spa-v2';
+const SHELL_CACHE = `${PYWEAVE_VERSION}-shell`;
+const PAGE_CACHE = `${PYWEAVE_VERSION}-pages`;
+const DATA_CACHE = `${PYWEAVE_VERSION}-inertia`;
+const RUNTIME_CACHE = `${PYWEAVE_VERSION}-runtime`;
+
+const APP_SHELL = [
+  '/',
+  '/static/manifest.webmanifest',
+  '/static/offline.html',
+  '/static/pyweave-spa.js',
+  '/static/icons/icon.svg',
+  '/static/icons/icon-192.png',
+  '/static/icons/icon-512.png'
+];
+
+const isSameOrigin = (request) => new URL(request.url).origin === self.location.origin;
+const isInertiaRequest = (request) => request.headers.get('X-Inertia') === 'true';
+const isAssetRequest = (request) => {
+  const url = new URL(request.url);
+  return url.pathname.startsWith('/static/') || url.pathname.startsWith('/assets/') || url.pathname.includes('/frontend/');
+};
+
+async function cacheAppShell() {
+  const cache = await caches.open(SHELL_CACHE);
+  await cache.addAll(APP_SHELL);
+}
+
+async function cacheOfflineRoutes() {
+  try {
+    const manifestResponse = await fetch('/__pyweave/offline-manifest', { headers: { Accept: 'application/json' } });
+    if (!manifestResponse.ok) return;
+    const manifest = await manifestResponse.json();
+    const routes = manifest.routes || [];
+
+    const pageCache = await caches.open(PAGE_CACHE);
+    const dataCache = await caches.open(DATA_CACHE);
+
+    await Promise.all(routes.map(async (path) => {
+      try {
+        const htmlRequest = new Request(path, { credentials: 'same-origin' });
+        const htmlResponse = await fetch(htmlRequest);
+        if (htmlResponse.ok) await pageCache.put(htmlRequest, htmlResponse.clone());
+
+        const inertiaRequest = new Request(path, {
+          credentials: 'same-origin',
+          headers: {
+            'Accept': 'application/json',
+            'X-Inertia': 'true',
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+        const inertiaResponse = await fetch(inertiaRequest);
+        if (inertiaResponse.ok) await dataCache.put(inertiaRequest, inertiaResponse.clone());
+      } catch (error) {
+        // Individual route failures should not break the rest of the offline cache.
+      }
+    }));
+  } catch (error) {
+    // The manifest endpoint may be unavailable during early development.
+  }
+}
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(cacheAppShell().then(cacheOfflineRoutes));
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(
+      keys
+        .filter((key) => ![SHELL_CACHE, PAGE_CACHE, DATA_CACHE, RUNTIME_CACHE].includes(key))
+        .map((key) => caches.delete(key))
+    ))
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'PYWEAVE_CACHE_OFFLINE_ROUTES') {
+    event.waitUntil(cacheOfflineRoutes());
+  }
+});
+
+async function networkFirst(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  try {
+    const response = await fetch(request);
+    if (response && response.ok) await cache.put(request, response.clone());
+    return response;
+  } catch (error) {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    throw error;
+  }
+}
+
+async function staleWhileRevalidate(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  const fetched = fetch(request).then((response) => {
+    if (response && response.ok) cache.put(request, response.clone());
+    return response;
+  }).catch(() => cached);
+  return cached || fetched;
+}
+
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  if (request.method !== 'GET' || !isSameOrigin(request)) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith((async () => {
+      try {
+        return await networkFirst(request, PAGE_CACHE);
+      } catch (error) {
+        const pageCache = await caches.open(PAGE_CACHE);
+        const cachedPage = await pageCache.match(request) || await pageCache.match('/');
+        return cachedPage || await caches.match('/static/offline.html');
+      }
+    })());
+    return;
+  }
+
+  if (isInertiaRequest(request)) {
+    event.respondWith(networkFirst(request, DATA_CACHE));
+    return;
+  }
+
+  if (isAssetRequest(request)) {
+    event.respondWith(staleWhileRevalidate(request, RUNTIME_CACHE));
+    return;
+  }
+
+  event.respondWith(staleWhileRevalidate(request, RUNTIME_CACHE));
+});

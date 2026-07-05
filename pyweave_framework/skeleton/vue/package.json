@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@inertiajs/vue3": "latest",
+    "@vitejs/plugin-vue": "latest",
+    "vite": "latest",
+    "vue": "latest"
+  },
+  "devDependencies": {
+    "vite-plugin-pwa": "latest"
+  }
+}

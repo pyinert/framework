@@ -1,0 +1,15 @@
+[project]
+name = "pyweave-framework-app"
+version = "0.1.0"
+description = "Default application skeleton for PyWeave. This repository is intended to be copied by pyweave-installer, not published to PyPI."
+requires-python = ">=3.10"
+dependencies = [
+  "pyweave",
+  "loom",
+  "pyweave-spa",
+  "pyweave-pwa",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
