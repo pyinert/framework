@@ -1,0 +1,29 @@
+# {{ project_name }}
+
+A PyInert application using `.pi` single-file route components.
+
+## Structure
+
+```text
+app/routes/index.pi          -> /
+app/routes/about.pi          -> /about
+app/routes/users/index.pi    -> /users
+app/routes/users/[id].pi     -> /users/<id>
+templates/app.html           -> application shell/layout
+```
+
+```html
+<?py
+layout("app")
+title("Dashboard")
+items = ["one", "two"]
+?>
+
+<h1>{{ title }}</h1>
+```
+
+Run:
+
+```bash
+python app/app.py
+```

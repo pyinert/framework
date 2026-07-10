@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#111827">
+    <link rel="manifest" href="/static/manifest.webmanifest">
+    <title>{{ page.props.title or "PyInert" }}</title>
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/users">Users</a>
+    </nav>
+
+    <main id="pyinert-app">{{ slot|safe }}</main>
+
+    <script src="/static/pyinert-spa.js"></script>
+    <script type="module" src="/frontend/register-pwa.js"></script>
+</body>
+</html>

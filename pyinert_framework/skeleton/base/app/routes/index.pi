@@ -1,0 +1,29 @@
+<?py
+layout("app")
+title("Welcome to PyInert")
+message = "Build Flask-powered apps with .pi single-file routes."
+features = [
+    "Folder and filename based routing",
+    "Top Python block as controller/config",
+    "Bottom Jinja/HTML as the view",
+    "SPA navigation without a frontend router",
+    "Offline-first PWA support",
+]
+?>
+
+<section class="hero">
+    <p class="eyebrow">PyInert</p>
+    <h1>{{ title }}</h1>
+    <p>{{ message }}</p>
+
+    <p>
+        <a href="/about">Learn about the architecture</a>
+        <a href="/users">View demo users</a>
+    </p>
+</section>
+
+<ul>
+{% for feature in features %}
+    <li>{{ feature }}</li>
+{% endfor %}
+</ul>

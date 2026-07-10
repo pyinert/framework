@@ -1,0 +1,9 @@
+<?py
+layout("app")
+title(f"User {id}")
+user = {"id": id, "name": f"Demo User {id}"}
+?>
+
+<h1>{{ user.name }}</h1>
+<p>This route came from <code>app/routes/users/[id].pi</code>.</p>
+<p><a href="/users">Back to users</a></p>

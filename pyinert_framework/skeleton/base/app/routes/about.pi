@@ -1,0 +1,15 @@
+<?py
+layout("app")
+title("About PyInert")
+?>
+
+<h1>{{ title }}</h1>
+
+<p>
+    A PyInert route is a single <code>.pi</code> file: the top Python block acts as the
+    controller and configuration section, while the HTML below it is the view.
+</p>
+
+<pre><code>app/routes/about.pi → /about</code></pre>
+
+<p><a href="/">Back home</a></p>

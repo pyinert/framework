@@ -1,0 +1,13 @@
+const PYINERT_VERSION = '{{ project_name }}-offline-v1';
+const SHELL_CACHE = `${PYINERT_VERSION}-shell`;
+const APP_SHELL = ['/', '/static/manifest.webmanifest', '/static/offline.html', '/static/pyinert-spa.js', '/static/icons/icon.svg'];
+self.addEventListener('install', event => event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.addAll(APP_SHELL))));
+self.addEventListener('fetch', event => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+  event.respondWith(fetch(request).then(response => {
+    const copy = response.clone();
+    caches.open(SHELL_CACHE).then(cache => cache.put(request, copy));
+    return response;
+  }).catch(() => caches.match(request).then(cached => cached || caches.match('/static/offline.html'))));
+});

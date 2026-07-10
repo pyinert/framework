@@ -1,0 +1,19 @@
+<?py
+layout("app")
+title("Users")
+users = [
+    {"id": 1, "name": "Ada Lovelace"},
+    {"id": 2, "name": "Grace Hopper"},
+    {"id": 3, "name": "Alan Turing"},
+]
+?>
+
+<h1>{{ title }}</h1>
+
+<ul>
+{% for user in users %}
+    <li><a href="/users/{{ user.id }}">{{ user.name }}</a></li>
+{% endfor %}
+</ul>
+
+<p><a href="/">Back home</a></p>
