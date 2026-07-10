@@ -1,8 +1,0 @@
-def page():
-    return {
-        "title": "Users",
-        "users": [
-            {"id": 1, "name": "Ada Lovelace"},
-            {"id": 2, "name": "Grace Hopper"},
-        ],
-    }
